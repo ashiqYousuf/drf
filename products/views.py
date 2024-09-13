@@ -1,3 +1,75 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
+from rest_framework import generics
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-# Create your views here.
+from .models import Product
+from .serializers import ProductSerializer
+
+# NOTE:- Generic API View
+
+
+class ProductListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def perform_create(self, serializer):
+        # instance = serializer.save(user=self.request.user)
+        title = serializer.validated_data.get('title')
+        content = serializer.validated_data.get('content', title)
+        serializer.save(content=content)
+        # send signals
+
+
+class ProductRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'pk'
+
+    def perform_update(self, serializer):
+        title = serializer.validated_data.get('title')
+        content = serializer.validated_data.get('content')
+        if not content:
+            content = title
+        serializer.save(content=content)
+        # instance.content = instance.content or instance.title
+        # instance.save()
+
+    def perform_destroy(self, instance):
+        # super().perform_destroy(instance)
+        instance.delete()
+
+    def destroy(self, request, *args, **kwargs):
+        response = super().destroy(request, *args, **kwargs)
+        response.status_code = 200
+        response.data = {"message": "Product deleted!"}
+        return response
+
+
+# class ProductDetailAPIView(generics.RetrieveAPIView):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+#     lookup_field = 'pk'
+
+
+@api_view(['GET', 'POST'])
+def product_alt_view(request, pk=None, *args, **kwargs):
+    """
+    List, Create, Detail APIs using Func based Api Views
+    """
+    match request.method:
+        case "GET":
+            if pk is not None:
+                instance = get_object_or_404(Product, pk=pk)
+                data = ProductSerializer(instance, many=False).data
+                return Response(data)
+            qs = Product.objects.all()
+            data = ProductSerializer(qs, many=True).data
+            return Response(data)
+        case "POST":
+            serializer = ProductSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            title = serializer.validated_data.get('title')
+            content = serializer.validated_data.get('content', title)
+            serializer.save(content=content)
+            return Response(serializer.data)
