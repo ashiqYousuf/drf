@@ -1,11 +1,14 @@
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
+from api.serializers import UserPublicSerializer
+
 from .models import Product
 from .validators import unique_product_title, validate_title
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    owner = UserPublicSerializer(source='user', read_only=True)
     discount = serializers.SerializerMethodField(read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
     a_url = serializers.HyperlinkedIdentityField(
@@ -13,6 +16,7 @@ class ProductSerializer(serializers.ModelSerializer):
     title = serializers.CharField(
         validators=[validate_title, unique_product_title]
     )
+    user_data = serializers.SerializerMethodField(read_only=True)
     # name = serializers.CharField(source='title', read_only=True)
     # if we have user attached to the model (f.k)
     # email = serializers.EmailField(source='user.email', read_only=True)
@@ -22,7 +26,8 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'pk',
-            #   'user',
+            'owner',
+            'user_data',
             'title',
             #   'name',
             'url',
@@ -44,6 +49,9 @@ class ProductSerializer(serializers.ModelSerializer):
     #     if qs.exists():
     #         raise serializers.ValidationError(f"{value} is already taken")
     #     return value
+
+    def get_user_data(self, obj):
+        return {"username": obj.user.username}
 
     def create(self, validated_data):
         """
