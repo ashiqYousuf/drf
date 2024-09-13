@@ -28,6 +28,13 @@
     
     12. Algolia search engine
 
+    13. Custom model managers and custom querysets
+
+    14. Custom model mixin classes
+
+    15. Custom permissions
+
+    16. python client (requests module) for testing APIs
 
 
 ## Test this repo?
