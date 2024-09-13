@@ -16,7 +16,7 @@ class ProductSerializer(serializers.ModelSerializer):
     title = serializers.CharField(
         validators=[validate_title, unique_product_title]
     )
-    user_data = serializers.SerializerMethodField(read_only=True)
+    # user_data = serializers.SerializerMethodField(read_only=True)
     # name = serializers.CharField(source='title', read_only=True)
     # if we have user attached to the model (f.k)
     # email = serializers.EmailField(source='user.email', read_only=True)
@@ -27,8 +27,9 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = [
             'pk',
             'owner',
-            'user_data',
+            # 'user_data',
             'title',
+            'public',
             #   'name',
             'url',
             'a_url',
@@ -50,8 +51,8 @@ class ProductSerializer(serializers.ModelSerializer):
     #         raise serializers.ValidationError(f"{value} is already taken")
     #     return value
 
-    def get_user_data(self, obj):
-        return {"username": obj.user.username}
+    # def get_user_data(self, obj):
+    #     return {"username": obj.user.username}
 
     def create(self, validated_data):
         """
