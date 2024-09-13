@@ -1,18 +1,18 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import authentication, generics, mixins, permissions
+from rest_framework import authentication, generics, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from api.authentication import TokenAuthentication
+from api.mixins import StaffEditorPermissionMixin
 
 from .models import Product
-from .permissions import IsStaffEditorPermission
 from .serializers import ProductSerializer
 
 # NOTE:- Generic API Views
 
 
-class ProductListCreateAPIView(generics.ListCreateAPIView):
+class ProductListCreateAPIView(StaffEditorPermissionMixin, generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = [
@@ -20,7 +20,7 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     # django-model-perms applies to GET PUT DELETE methods only (override | custom perms)
     # permission_classes = [permissions.DjangoModelPermissions]
-    permission_classes = [IsStaffEditorPermission]
+    # permission_classes = [IsStaffEditorPermission]
 
     def perform_create(self, serializer):
         # instance = serializer.save(user=self.request.user)
@@ -30,13 +30,13 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
         # send signals
 
 
-class ProductRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class ProductRetrieveUpdateDestroyAPIView(StaffEditorPermissionMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = [
         authentication.SessionAuthentication, TokenAuthentication]
     # permission_classes = [permissions.DjangoModelPermissions]
-    permission_classes = [IsStaffEditorPermission]
+    # permission_classes = [IsStaffEditorPermission]
 
     lookup_field = 'pk'
 
