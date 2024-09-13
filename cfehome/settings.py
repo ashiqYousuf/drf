@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'algoliasearch_django',
     'rest_framework',
     'rest_framework.authtoken',
 ]
@@ -123,4 +125,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10
+}
+
+ALGOLIA = {
+    'APPLICATION_ID': os.getenv('ALGOLIA_APPLICATION_ID'),
+    'API_KEY': os.getenv('ALGOLIA_API_KEY'),
+    'INDEX_PREFIX': 'cfe',
 }
