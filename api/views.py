@@ -1,18 +1,40 @@
-from django.forms.models import model_to_dict
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from products.models import Product
+from products.serializers import ProductSerializer
 
 
+# NOTE:- Injest data into Serializers
+@api_view(['POST'])
+def api_home(request, *args, **kwargs):
+    serializer = ProductSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    # instance = serializer.save()
+    data = serializer.data
+    return Response(data)
+
+
+"""
+NOTE:- DRF API with Serializer
 @api_view(['GET', 'POST'])
 def api_home(request, *args, **kwargs):
-    # NOTE:- DRF Api
+    instance = Product.objects.all().order_by("?").first()
+    data = ProductSerializer(instance).data
+    return Response(data)
+"""
+
+"""
+NOTE:- DRF API w/o serializers
+@api_view(['GET'])
+def api_home(request, *args, **kwargs):
     instance = Product.objects.all().order_by("?").first()
     data = {}
     if instance:
-        data = model_to_dict(instance, fields=['id', 'title', 'price'])
+        data = model_to_dict(
+            instance, fields=['id', 'title', 'price', 'sale_price'])
     return Response(data)
+"""
 
 
 """
