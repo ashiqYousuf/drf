@@ -1,12 +1,12 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import generics
+from rest_framework import generics, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Product
 from .serializers import ProductSerializer
 
-# NOTE:- Generic API View
+# NOTE:- Generic API Views
 
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
@@ -50,6 +50,40 @@ class ProductRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
 #     queryset = Product.objects.all()
 #     serializer_class = ProductSerializer
 #     lookup_field = 'pk'
+
+
+# NOTE:- Mixin classes
+
+"""
+CreateAPIView(CreateModelMixin, GenericAPIView)
+"""
+
+
+class ProductMixinView(generics.GenericAPIView, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'pk'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Method: GET
+        """
+        pk = kwargs.get('pk', None)
+        if pk:
+            return self.retrieve(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        title = serializer.validated_data.get('title')
+        content = serializer.validated_data.get('content')
+        if not content:
+            content = "Some Fixed Content :("
+        serializer.save(content=content)
+
+# NOTE:- Function Based API View
 
 
 @api_view(['GET', 'POST'])
