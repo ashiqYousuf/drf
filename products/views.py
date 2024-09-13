@@ -3,6 +3,8 @@ from rest_framework import authentication, generics, mixins, permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from api.authentication import TokenAuthentication
+
 from .models import Product
 from .permissions import IsStaffEditorPermission
 from .serializers import ProductSerializer
@@ -13,7 +15,8 @@ from .serializers import ProductSerializer
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    authentication_classes = [authentication.SessionAuthentication]
+    authentication_classes = [
+        authentication.SessionAuthentication, TokenAuthentication]
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     # django-model-perms applies to GET PUT DELETE methods only (override | custom perms)
     # permission_classes = [permissions.DjangoModelPermissions]
@@ -30,7 +33,8 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
 class ProductRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    authentication_classes = [authentication.SessionAuthentication]
+    authentication_classes = [
+        authentication.SessionAuthentication, TokenAuthentication]
     # permission_classes = [permissions.DjangoModelPermissions]
     permission_classes = [IsStaffEditorPermission]
 
