@@ -3,6 +3,7 @@ import random
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
+from django.urls import reverse
 
 User = settings.AUTH_USER_MODEL
 
@@ -49,6 +50,17 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('product-detail', kwargs={'pk': self.pk})
+
+    @property
+    def path(self):
+        return f'/products/{self.pk}/'
+
+    @property
+    def body(self):
+        return self.content
 
     def is_public(self) -> bool:
         return self.public

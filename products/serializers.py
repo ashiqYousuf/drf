@@ -8,11 +8,15 @@ from .validators import unique_product_title, validate_title
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    """
+    source:- uses methods or properties of the model to generate values
+    for the serialized output.
+    """
     owner = UserPublicSerializer(source='user', read_only=True)
     discount = serializers.SerializerMethodField(read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
     a_url = serializers.HyperlinkedIdentityField(
-        view_name='product-detail', lookup_field='pk')
+        view_name='product-detail', lookup_field='pk', read_only=True)
     title = serializers.CharField(
         validators=[validate_title, unique_product_title]
     )
@@ -21,6 +25,9 @@ class ProductSerializer(serializers.ModelSerializer):
     # if we have user attached to the model (f.k)
     # email = serializers.EmailField(source='user.email', read_only=True)
     # email = serializers.EmailField(write_only=True)
+    # change field name [content -> body]
+    body = serializers.CharField(source='content')
+    api_url = serializers.CharField(source='get_absolute_url', read_only=True)
 
     class Meta:
         model = Product
@@ -33,10 +40,13 @@ class ProductSerializer(serializers.ModelSerializer):
             #   'name',
             'url',
             'a_url',
-            'content',
+            'body',
+            # 'content',
             'price',
             'sale_price',
-            'discount'
+            'discount',
+            'path',
+            'api_url',
         ]
 
     # def validate_title(self, value):
