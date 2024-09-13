@@ -11,5 +11,3 @@ router = DefaultRouter()
 router.register('products-abc', ProductGenericViewSet, basename='products')
 
 urlpatterns = router.urls
-
-print(router.urls)

@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from api.authentication import TokenAuthentication
-from api.mixins import StaffEditorPermissionMixin
+from api.mixins import StaffEditorPermissionMixin, UserQuerysetMixin
 
 from .models import Product
 from .serializers import ProductSerializer
@@ -12,11 +12,14 @@ from .serializers import ProductSerializer
 # NOTE:- Generic API Views
 
 
-class ProductListCreateAPIView(StaffEditorPermissionMixin, generics.ListCreateAPIView):
+class ProductListCreateAPIView(StaffEditorPermissionMixin, UserQuerysetMixin, generics.ListCreateAPIView):
+    # user_field = 'owner'
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = [
         authentication.SessionAuthentication, TokenAuthentication]
+    allow_staff_view = False
+    # user_field = 'owner'
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     # django-model-perms applies to GET PUT DELETE methods only (override | custom perms)
     # permission_classes = [permissions.DjangoModelPermissions]
@@ -25,12 +28,19 @@ class ProductListCreateAPIView(StaffEditorPermissionMixin, generics.ListCreateAP
     def perform_create(self, serializer):
         # instance = serializer.save(user=self.request.user)
         title = serializer.validated_data.get('title')
-        content = serializer.validated_data.get('content', title)
-        serializer.save(content=content)
+        content = serializer.validated_data.get('content', None)
+        if not content:
+            content = title
+        # we don't need user field in serializers now!
+        serializer.save(content=content, user=self.request.user)
         # send signals
 
+    # def get_queryset(self, *args, **kwargs):
+    #     qs = super().get_queryset(*args, **kwargs)
+    #     return qs.filter(user=self.request.user)
 
-class ProductRetrieveUpdateDestroyAPIView(StaffEditorPermissionMixin, generics.RetrieveUpdateDestroyAPIView):
+
+class ProductRetrieveUpdateDestroyAPIView(StaffEditorPermissionMixin, UserQuerysetMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = [
