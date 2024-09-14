@@ -1,3 +1,4 @@
+import datetime
 import os
 from pathlib import Path
 
@@ -30,6 +31,7 @@ INSTALLED_APPS = [
     'algoliasearch_django',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
 ]
 
 INSTALLED_APPS += [
@@ -124,11 +126,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'api.authentication.TokenAuthentication',
+    ),
 }
 
 ALGOLIA = {
     'APPLICATION_ID': os.getenv('ALGOLIA_APPLICATION_ID'),
     'API_KEY': os.getenv('ALGOLIA_API_KEY'),
     'INDEX_PREFIX': 'cfe',
+}
+
+
+SIMPLW_JWT = {
+    'AUTH_HEADER_TYPES': ['Bearer'],
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(seconds=30),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(minutes=1),
 }

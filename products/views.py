@@ -16,8 +16,8 @@ class ProductListCreateAPIView(StaffEditorPermissionMixin, UserQuerysetMixin, ge
     # user_field = 'owner'
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    authentication_classes = [
-        authentication.SessionAuthentication, TokenAuthentication]
+    # authentication_classes = [
+    #     authentication.SessionAuthentication, TokenAuthentication]
     allow_staff_view = False
     # user_field = 'owner'
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -43,8 +43,8 @@ class ProductListCreateAPIView(StaffEditorPermissionMixin, UserQuerysetMixin, ge
 class ProductRetrieveUpdateDestroyAPIView(StaffEditorPermissionMixin, UserQuerysetMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    authentication_classes = [
-        authentication.SessionAuthentication, TokenAuthentication]
+    # authentication_classes = [
+    #     authentication.SessionAuthentication, TokenAuthentication]
     # permission_classes = [permissions.DjangoModelPermissions]
     # permission_classes = [IsStaffEditorPermission]
 
