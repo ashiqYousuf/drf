@@ -36,6 +36,8 @@
 
     16. python client (requests module) for testing APIs
 
+    17. JWT Authentication
+
 
 ## Test this repo?
     
